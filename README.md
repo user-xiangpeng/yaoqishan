@@ -16,3 +16,9 @@
 编译器：idea
 JDK：1.8
 tomcat：tomcat8
+
+前台页面直接访问：http://localhost:8080/
+
+后台登录入口：http://localhost:8080/admin/login.action
+用户名：admin
+密码:111111
