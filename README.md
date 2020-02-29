@@ -1,5 +1,5 @@
 # yaoqishan
- 妖气山视频管理系统
+ 妖气山视频管理系统-mysql版
  
  源码来自：https://gitee.com/javaex/yaoqishan#only_comment_project  如有侵权，请联系删除。
 
