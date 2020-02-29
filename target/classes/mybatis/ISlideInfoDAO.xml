@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.slide_info.ISlideInfoDAO">
+	
+	<!-- 建立sql查询结果幻灯片数据与实体属性的映射关系 -->
+	<resultMap id="SlideInfoMap" type="cn.javaex.yaoqishan.view.SlideInfo">
+		<result column="id" property="id" />
+		<result column="api_id" property="apiId" />
+		<result column="title" property="title" />
+		<result column="summary" property="summary" />
+		<result column="image" property="image" />
+		<result column="thumbnail" property="thumbnail" />
+		<result column="url" property="url" />
+		<result column="sort" property="sort" />
+	</resultMap>
+	
+	<!-- 根据幻灯片主键，查询所有幻灯片数据 -->
+	<select id="listByApiId" resultMap="SlideInfoMap">
+		SELECT
+			*
+		FROM
+			slide_info
+		WHERE
+			api_id = #{apiId}
+		ORDER BY
+			sort
+	</select>
+	
+	<!-- 接口专用 -->
+	<!-- 根据幻灯片主键，查询所有幻灯片数据 -->
+	<select id="mapListByApiId" resultType="hashmap">
+		SELECT
+			title,
+			summary,
+			image,
+			thumbnail,
+			url
+		FROM
+			slide_info
+		WHERE
+			api_id = #{apiId}
+		ORDER BY
+			sort
+	</select>
+	
+	<!-- 插入新的幻灯片数据 -->
+	<insert id="insert">
+		INSERT INTO slide_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="apiId!=null and apiId!=''">api_id,</if>
+			<if test="title!=null and title!=''">title,</if>
+			<if test="summary!=null and summary!=''">summary,</if>
+			<if test="image!=null and image!=''">image,</if>
+			<if test="thumbnail!=null and thumbnail!=''">thumbnail,</if>
+			<if test="url!=null and url!=''">url,</if>
+			<if test="sort!=null and sort!=''">sort,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="apiId!=null and apiId!=''">#{apiId},</if>
+			<if test="title!=null and title!=''">#{title},</if>
+			<if test="summary!=null and summary!=''">#{summary},</if>
+			<if test="image!=null and image!=''">#{image},</if>
+			<if test="thumbnail!=null and thumbnail!=''">#{thumbnail},</if>
+			<if test="url!=null and url!=''">#{url},</if>
+			<if test="sort!=null and sort!=''">#{sort},</if>
+		</trim>
+	</insert>
+	
+	<!-- 更新幻灯片数据 -->
+	<update id="update">
+		UPDATE slide_info
+		<set>
+			<if test="apiId!=null">api_id=#{apiId},</if>
+			<if test="title!=null">title=#{title},</if>
+			<if test="summary!=null">summary=#{summary},</if>
+			<if test="image!=null">image=#{image},</if>
+			<if test="thumbnail!=null">thumbnail=#{thumbnail},</if>
+			<if test="url!=null">url=#{url},</if>
+			<if test="sort!=null">sort=#{sort},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除幻灯片数据 -->
+	<delete id="delete">
+		DELETE FROM slide_info WHERE id IN
+		<foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

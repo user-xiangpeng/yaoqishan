@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.collection_info.ICollectionInfoDAO">
+
+    <!-- 建立sql查询结果字段与实体属性的映射关系 -->
+    <resultMap id="CollectionInfoMap" type="cn.javaex.yaoqishan.view.CollectionInfo">
+        <result column="id" property="id"/>
+        <result column="media_id" property="mediaId"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+    <!-- 判断该视频是否已被用户收藏过了 -->
+    <select id="countByMediaIdAndUserId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			collection_info
+		WHERE
+			media_id = #{mediaId}
+		AND user_id = #{userId}
+	</select>
+
+    <!-- 插入新的视频收藏 -->
+    <insert id="insert">
+        INSERT INTO collection_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mediaId!=null and mediaId!=''">media_id,</if>
+            <if test="userId!=null and userId!=''">user_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mediaId!=null and mediaId!=''">#{mediaId},</if>
+            <if test="userId!=null and userId!=''">#{userId},</if>
+        </trim>
+    </insert>
+
+    <!-- 删除收藏的视频 -->
+    <delete id="delete">
+        DELETE
+        FROM
+        collection_info
+        WHERE
+        user_id = #{userId}
+        <if test="mediaId!=null and mediaId!=''">
+            AND media_id = #{mediaId}
+        </if>
+    </delete>
+
+    <!-- 获取用户的视频收藏列表 -->
+    <select id="listCollection" resultType="hashmap">
+		SELECT
+			mi.media_id,
+			mi.biaoti,
+			mi.fengmian,
+			mi.zongjishu,
+			mi.status,
+			ti.name AS typeName
+		FROM
+			collection_info ci,
+			media_info mi,
+			type_info ti
+		WHERE
+			ci.media_id = mi.media_id
+		AND mi.type_id = ti.id
+		AND ci.user_id = #{userId}
+		ORDER BY
+			ci.id DESC
+	</select>
+
+    <!-- 删除收藏表中的内容 -->
+    <delete id="deleteByUserIdArr">
+        DELETE FROM collection_info WHERE user_id IN
+        <foreach collection="userIdArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

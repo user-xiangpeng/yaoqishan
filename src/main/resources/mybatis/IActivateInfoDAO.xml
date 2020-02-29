@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.activate_info.IActivateInfoDAO">
+
+    <!-- 建立sql查询结果接口与实体属性的映射关系 -->
+    <resultMap id="ActivateInfoMap" type="cn.javaex.yaoqishan.view.ActivateInfo">
+        <result column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="type" property="type"/>
+        <result column="code" property="code"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 根据用户id和验证类型，判断认证是否已存在 -->
+    <select id="selectByUserIdAndType" resultMap="ActivateInfoMap">
+		SELECT
+			*
+		FROM
+			activate_info
+		WHERE
+			user_id = #{userId}
+		AND type = #{type}
+	</select>
+
+    <!-- 插入 -->
+    <insert id="insert">
+        INSERT INTO activate_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId!=null and userId!=''">user_id,</if>
+            <if test="type!=null and type!=''">type,</if>
+            <if test="code!=null and code!=''">code,</if>
+            <if test="createTime!=null and createTime!=''">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId!=null and userId!=''">#{userId},</if>
+            <if test="type!=null and type!=''">#{type},</if>
+            <if test="code!=null and code!=''">#{code},</if>
+            <if test="createTime!=null and createTime!=''">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update">
+        UPDATE activate_info
+        <set>
+            <if test="userId!=null">user_id=#{userId},</if>
+            <if test="type!=null">type=#{type},</if>
+            <if test="code!=null">code=#{code},</if>
+            <if test="createTime!=null">create_time=#{createTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除验证记录 -->
+    <delete id="delete">
+		DELETE FROM activate_info WHERE id = #{id}
+	</delete>
+
+    <!-- 获取验证记录 -->
+    <select id="selectByEmailAndCodeAndType" resultMap="ActivateInfoMap">
+		SELECT
+			ai.user_id,
+			ai.create_time
+		FROM
+			user_info ui,
+			activate_info ai
+		WHERE
+			ui.id = ai.user_id
+		AND ui.email = #{email}
+		AND ai.code = #{code}
+		AND ai.type = #{type}
+	</select>
+</mapper>

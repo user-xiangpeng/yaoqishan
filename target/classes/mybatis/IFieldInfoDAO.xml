@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.field_info.IFieldInfoDAO">
+
+    <!-- 建立sql查询结果字段与实体属性的映射关系 -->
+    <resultMap id="FieldInfoMap" type="cn.javaex.yaoqishan.view.FieldInfo">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="sort" property="sort"/>
+        <result column="input_type" property="inputType"/>
+        <result column="var_name" property="varName"/>
+        <result column="is_allow_edit" property="isAllowEdit"/>
+    </resultMap>
+
+    <!-- 查询字段列表 -->
+    <select id="list" resultMap="FieldInfoMap">
+		SELECT
+			*
+		FROM
+			field_info
+		WHERE
+			type = 'user'
+		ORDER BY
+			sort
+	</select>
+
+    <!-- 查询分类下的字段列表 -->
+    <select id="listByTypeId" resultMap="FieldInfoMap">
+		SELECT
+			fi.*
+		FROM
+			field_info fi,
+			type_field tf
+		WHERE
+			fi.id = tf.field_id
+		AND tf.type_id = #{typeId}
+		AND fi.type = 'user'
+		ORDER BY
+			tf.sort
+	</select>
+
+    <!-- 根据主键查询字段信息 -->
+    <select id="selectById" resultMap="FieldInfoMap">
+		SELECT
+			*
+		FROM
+			field_info
+		WHERE
+			id = #{id}
+	</select>
+
+    <!-- 校验字段变量名是否重复 -->
+    <select id="countByVarName" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        field_info
+        WHERE
+        var_name = #{varName}
+        <if test="id!=null and id!=''">AND id != #{id}</if>
+    </select>
+
+    <!-- 查询分类筛选字段列表 -->
+    <select id="listCategoryField" resultMap="FieldInfoMap">
+		SELECT
+			fi.id,
+			fi.name,
+			fi.var_name,
+			fi.input_type
+		FROM
+			field_info fi,
+			type_field tf
+		WHERE
+			fi.id = tf.field_id
+		AND tf.is_screen = '1'
+		AND tf.type_id = #{typeId}
+		ORDER BY
+			tf.sort
+	</select>
+
+    <!-- 插入新的字段 -->
+    <insert id="insert">
+        INSERT INTO field_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sort!=null and sort!=''">sort,</if>
+            <if test="name!=null and name!=''">name,</if>
+            <if test="varName!=null and varName!=''">var_name,</if>
+            <if test="inputType!=null and inputType!=''">input_type,</if>
+            <if test="type!=null and type!=''">type,</if>
+            <if test="isAllowEdit!=null and isAllowEdit!=''">is_allow_edit,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sort!=null and sort!=''">#{sort},</if>
+            <if test="name!=null and name!=''">#{name},</if>
+            <if test="varName!=null and varName!=''">#{varName},</if>
+            <if test="inputType!=null and inputType!=''">#{inputType},</if>
+            <if test="type!=null and type!=''">#{type},</if>
+            <if test="isAllowEdit!=null and isAllowEdit!=''">#{isAllowEdit},</if>
+        </trim>
+    </insert>
+
+    <!-- 更新字段 -->
+    <update id="update">
+        UPDATE field_info
+        <set>
+            <if test="sort!=null">sort=#{sort},</if>
+            <if test="name!=null">name=#{name},</if>
+            <if test="varName!=null">var_name=#{varName},</if>
+            <if test="inputType!=null">input_type=#{inputType},</if>
+            <if test="content!=null">content=#{content},</if>
+            <if test="isAllowEdit!=null">is_allow_edit=#{isAllowEdit},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除字段 -->
+    <delete id="delete">
+        DELETE FROM field_info WHERE id IN
+        <foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 根据主键数组查询字段的变量名 -->
+    <select id="listVarNameByIdArr" resultType="String">
+        SELECT
+        var_name
+        FROM
+        field_info
+        WHERE id IN
+        <foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 查询单选框字段 -->
+    <select id="listRadio" resultMap="FieldInfoMap">
+		SELECT
+			id,
+			name,
+			var_name,
+			content
+		FROM
+			field_info
+		WHERE
+			input_type = 'radio'
+		ORDER BY
+			sort
+	</select>
+
+    <!-- 根据分类id，查询该分类的单选框字段 -->
+    <select id="listRadioByTypeId" resultMap="FieldInfoMap">
+		SELECT
+			fi.id,
+			fi.name,
+			fi.var_name,
+			fi.content
+		FROM
+			field_info fi,
+			type_field tf
+		WHERE
+			fi.id = tf.field_id
+		AND tf.type_id = #{typeId}
+		AND fi.input_type = 'radio'
+		ORDER BY
+			fi.sort
+	</select>
+
+    <!-- 根据字段变量名，查询字段信息 -->
+    <select id="selectByVarName" resultMap="FieldInfoMap">
+		SELECT
+			input_type
+		FROM
+			field_info
+		WHERE
+			var_name = #{varName}
+	</select>
+</mapper>

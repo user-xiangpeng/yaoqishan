@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.reply_info.IReplyInfoDAO">
+	
+	<!-- 建立sql查询结果接口与实体属性的映射关系 -->
+	<resultMap id="ReplyInfoMap" type="cn.javaex.yaoqishan.view.ReplyInfo">
+		<result column="id" property="id" />
+		<result column="video_id" property="videoId" />
+		<result column="comment_id" property="commentId" />
+		<result column="user_id" property="userId" />
+		<result column="login_name" property="loginName" />
+		<result column="to_user_id" property="toUserId" />
+		<result column="to_login_name" property="toLoginName" />
+		<result column="content" property="content" />
+		<result column="update_time" property="updateTime" />
+	</resultMap>
+	
+	<!-- 插入新的接口 -->
+	<insert id="insert">
+		INSERT INTO reply_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="videoId!=null and videoId!=''">video_id,</if>
+			<if test="commentId!=null and commentId!=''">comment_id,</if>
+			<if test="userId!=null and userId!=''">user_id,</if>
+			<if test="loginName!=null and loginName!=''">login_name,</if>
+			<if test="toUserId!=null and toUserId!=''">to_user_id,</if>
+			<if test="toLoginName!=null and toLoginName!=''">to_login_name,</if>
+			<if test="content!=null and content!=''">content,</if>
+			<if test="updateTime!=null and updateTime!=''">update_time,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="videoId!=null and videoId!=''">#{videoId},</if>
+			<if test="commentId!=null and commentId!=''">#{commentId},</if>
+			<if test="userId!=null and userId!=''">#{userId},</if>
+			<if test="loginName!=null and loginName!=''">#{loginName},</if>
+			<if test="toUserId!=null and toUserId!=''">#{toUserId},</if>
+			<if test="toLoginName!=null and toLoginName!=''">#{toLoginName},</if>
+			<if test="content!=null and content!=''">#{content},</if>
+			<if test="updateTime!=null and updateTime!=''">#{updateTime},</if>
+		</trim>
+	</insert>
+	
+	<!-- 获取某个视频的评论列表 -->
+	<select id="listByCommentId" resultMap="ReplyInfoMap">
+		SELECT
+			ri.id,
+			ri.comment_id,
+			ri.user_id,
+			ri.login_name,
+			ri.to_user_id,
+			ri.to_login_name,
+			ri.content,
+			CONVERT(varchar(100), ri.update_time, 120) AS update_time,
+			upi.avatar
+		FROM
+			reply_info ri,
+			user_profile_info upi
+		WHERE
+			ri.user_id = upi.user_id
+		AND ri.comment_id = #{commentId}
+		ORDER BY update_time DESC
+	</select>
+	
+	<!-- 获取某个视频的回复条数 -->
+	<select id="countByVideoId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			reply_info
+		WHERE
+			video_id = #{videoId}
+	</select>
+	
+	<!-- 删除回复表中的内容 -->
+	<delete id="deleteByUserIdArr">
+		DELETE FROM reply_info WHERE user_id IN
+		<foreach collection="userIdArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

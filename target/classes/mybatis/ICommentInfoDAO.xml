@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.comment_info.ICommentInfoDAO">
+
+    <!-- 建立sql查询结果接口与实体属性的映射关系 -->
+    <resultMap id="CommentInfoMap" type="cn.javaex.yaoqishan.view.CommentInfo">
+        <result column="id" property="id"/>
+        <result column="video_id" property="videoId"/>
+        <result column="user_id" property="userId"/>
+        <result column="login_name" property="loginName"/>
+        <result column="content" property="content"/>
+        <result column="update_time" property="updateTime"/>
+
+        <result column="avatar" property="avatar"/>
+    </resultMap>
+
+    <!-- 插入新的接口 -->
+    <insert id="insert">
+        INSERT INTO comment_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="videoId!=null and videoId!=''">video_id,</if>
+            <if test="userId!=null and userId!=''">user_id,</if>
+            <if test="loginName!=null and loginName!=''">login_name,</if>
+            <if test="content!=null and content!=''">content,</if>
+            <if test="updateTime!=null and updateTime!=''">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="videoId!=null and videoId!=''">#{videoId},</if>
+            <if test="userId!=null and userId!=''">#{userId},</if>
+            <if test="loginName!=null and loginName!=''">#{loginName},</if>
+            <if test="content!=null and content!=''">#{content},</if>
+            <if test="updateTime!=null and updateTime!=''">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <!-- 获取某个视频的评论列表 -->
+    <select id="listByVideoId" resultMap="CommentInfoMap">
+		SELECT
+			ci.id,
+			ci.video_id,
+			ci.user_id,
+			ci.login_name,
+			ci.content,
+			CONVERT(varchar(100), ci.update_time, 120) AS update_time,
+			upi.avatar
+		FROM
+			comment_info ci,
+			user_profile_info upi
+		WHERE
+			ci.user_id = upi.user_id
+		AND ci.video_id = #{videoId}
+		ORDER BY update_time DESC
+	</select>
+
+    <!-- 获取某个视频的评论条数 -->
+    <select id="countByVideoId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			comment_info
+		WHERE
+			video_id = #{videoId}
+	</select>
+
+    <!-- 删除评论表中的内容 -->
+    <delete id="deleteByUserIdArr">
+        DELETE FROM comment_info WHERE user_id IN
+        <foreach collection="userIdArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="yaoqishan:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>yaoqishan</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="yaoqishao.war">
+      <element id="artifact" artifact-name="yaoqishan:war exploded" />
+    </root>
+  </artifact>
+</component>

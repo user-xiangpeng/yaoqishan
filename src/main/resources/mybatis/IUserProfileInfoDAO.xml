@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.user_profile_info.IUserProfileInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="UserProfileInfoMap" type="cn.javaex.yaoqishan.view.UserProfileInfo">
+		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="group_id" property="groupId" />
+		<result column="avatar" property="avatar" />
+		<result column="sign_personal" property="signPersonal" />
+		<result column="point" property="point" />
+	</resultMap>
+	
+	<!-- 注册新用户 -->
+	<insert id="insert">
+		INSERT INTO user_profile_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userId!=null and userId!=''">user_id,</if>
+			<if test="groupId!=null and groupId!=''">group_id,</if>
+			<if test="avatar!=null and avatar!=''">avatar,</if>
+			<if test="signPersonal!=null and signPersonal!=''">sign_personal,</if>
+			<if test="point!=null and point!=''">point,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userId!=null and userId!=''">#{userId},</if>
+			<if test="groupId!=null and groupId!=''">#{groupId},</if>
+			<if test="avatar!=null and avatar!=''">#{avatar},</if>
+			<if test="signPersonal!=null and signPersonal!=''">#{signPersonal},</if>
+			<if test="point!=null and point!=''">#{point},</if>
+		</trim>
+	</insert>
+	
+	<!-- 查询指定用户组的数量 -->
+	<select id="countByGroupId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			user_profile_info
+		WHERE
+			group_id = #{groupId}
+	</select>
+	
+	<!-- 更新用户扩展信息 -->
+	<update id="update">
+		UPDATE user_profile_info
+		<set>
+			<if test="groupId!=null">group_id=#{groupId},</if>
+			<if test="avatar!=null">avatar=#{avatar},</if>
+			<if test="signPersonal!=null">sign_personal=#{signPersonal},</if>
+			<if test="point!=null">point=#{point},</if>
+		</set>
+		WHERE user_id = #{userId}
+	</update>
+	
+	<!-- 批量更新用户 -->
+	<update id="batchUpdate">
+		UPDATE user_profile_info 
+		<set>
+			<if test="groupId!=null">group_id=#{groupId},</if>
+		</set>
+		WHERE user_id IN
+		<foreach collection="userIdArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

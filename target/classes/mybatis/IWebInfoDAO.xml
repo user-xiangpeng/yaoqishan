@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.web_info.IWebInfoDAO">
+
+    <!-- 建立sql查询结果字段与实体属性的映射关系 -->
+    <resultMap id="WebInfoMap" type="cn.javaex.yaoqishan.view.WebInfo">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="domain" property="domain"/>
+        <result column="email" property="email"/>
+        <result column="record_number" property="recordNumber"/>
+        <result column="statistical_code" property="statisticalCode"/>
+    </resultMap>
+
+    <select id="select" resultMap="WebInfoMap">
+        SELECT
+        *
+        FROM
+        web_info
+        WHERE
+        id = '1'
+    </select>
+
+    <!-- 更新频道 -->
+    <update id="update">
+        UPDATE web_info
+        <set>
+            <if test="name!=null">name=#{name},</if>
+            <if test="domain!=null">domain=#{domain},</if>
+            <if test="email!=null">email=#{email},</if>
+            <if test="recordNumber!=null">record_number=#{recordNumber},</if>
+            <if test="statisticalCode!=null">statistical_code=#{statisticalCode},</if>
+        </set>
+        WHERE id = '1'
+    </update>
+</mapper>

@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.email_info.IEmailInfoDAO">
+
+    <!-- 建立sql查询结果接口与实体属性的映射关系 -->
+    <resultMap id="EmailInfoMap" type="cn.javaex.yaoqishan.view.EmailInfo">
+        <result column="id" property="id"/>
+        <result column="smtp" property="smtp"/>
+        <result column="port" property="port"/>
+        <result column="email" property="email"/>
+        <result column="password" property="password"/>
+    </resultMap>
+
+    <!-- 查询邮件设置列表 -->
+    <select id="list" resultMap="EmailInfoMap">
+		SELECT
+			*
+		FROM
+			email_info
+		ORDER BY
+			id
+	</select>
+
+    <!-- 插入 -->
+    <insert id="insert">
+        INSERT INTO email_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="smtp!=null and smtp!=''">smtp,</if>
+            <if test="port!=null and port!=''">port,</if>
+            <if test="email!=null and email!=''">email,</if>
+            <if test="password!=null and password!=''">password,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="smtp!=null and smtp!=''">#{smtp},</if>
+            <if test="port!=null and port!=''">#{port},</if>
+            <if test="email!=null and email!=''">#{email},</if>
+            <if test="password!=null and password!=''">#{password},</if>
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update">
+        UPDATE email_info
+        <set>
+            <if test="smtp!=null">smtp=#{smtp},</if>
+            <if test="port!=null">port=#{port},</if>
+            <if test="email!=null">email=#{email},</if>
+            <if test="password!=null">password=#{password},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="delete">
+        DELETE FROM email_info WHERE id IN
+        <foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 根据主键查询记录信息 -->
+    <select id="selectById" resultMap="EmailInfoMap">
+		SELECT
+			*
+		FROM
+			email_info
+		WHERE
+			id = #{id}
+	</select>
+</mapper>

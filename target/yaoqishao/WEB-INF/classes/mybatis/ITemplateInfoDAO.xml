@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.template_info.ITemplateInfoDAO">
+	<cache/>
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="TemplateInfoMap" type="cn.javaex.yaoqishan.view.TemplateInfo">
+		<result column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="name" property="name" />
+	</resultMap>
+	
+	<!-- 根据类型查询已选的模板 -->
+	<select id="selectByType" resultMap="TemplateInfoMap">
+		SELECT
+			*
+		FROM
+			template_info
+		WHERE
+			type = #{type}
+	</select>
+	
+	<!-- 更新模板风格的配置 -->
+	<update id="update">
+		UPDATE template_info
+		<set>
+			<if test="name!=null and name!=''">name=#{name},</if>
+		</set>
+		WHERE type = #{type}
+	</update>
+	
+	<!-- 获取类型对应的模板名称 -->
+	<select id="selectNameByType" resultType="String">
+		SELECT
+			name
+		FROM
+			template_info
+		WHERE
+			type = #{type}
+	</select>
+</mapper>

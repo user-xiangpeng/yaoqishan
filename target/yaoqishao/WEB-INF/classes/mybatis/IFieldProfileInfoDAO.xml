@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.field_profile_info.IFieldProfileInfoDAO">
+
+    <!-- 建立sql查询结果字段与实体属性的映射关系 -->
+    <resultMap id="FieldProfileInfoMap" type="cn.javaex.yaoqishan.view.FieldProfileInfo">
+        <result column="id" property="id"/>
+        <result column="field_id" property="fieldId"/>
+        <result column="name" property="name"/>
+        <result column="sort" property="sort"/>
+    </resultMap>
+
+    <!-- 根据字段主键查询字段详情列表 -->
+    <select id="listByFieldId" resultMap="FieldProfileInfoMap">
+		SELECT
+			*
+		FROM
+			field_profile_info
+		WHERE
+			field_id = #{fieldId}
+		ORDER BY
+			sort
+	</select>
+
+    <!-- 根据主键，查询对应的文本 -->
+    <select id="selectById" resultType="String">
+		SELECT
+			name
+		FROM
+			field_profile_info
+		WHERE
+			id = #{id}
+	</select>
+
+    <!-- 根据主键数组，查询对应的文本list -->
+    <select id="selectByIdArr" resultType="String">
+        SELECT
+        name
+        FROM
+        field_profile_info
+        WHERE id IN
+        <foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 插入一条新数据 -->
+    <insert id="insert">
+        INSERT INTO field_profile_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sort!=null and sort!=''">sort,</if>
+            <if test="name!=null and name!=''">name,</if>
+            <if test="fieldId!=null and fieldId!=''">field_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sort!=null and sort!=''">#{sort},</if>
+            <if test="name!=null and name!=''">#{name},</if>
+            <if test="fieldId!=null and fieldId!=''">#{fieldId},</if>
+        </trim>
+    </insert>
+
+    <!-- 更新一条新数据 -->
+    <update id="update">
+        UPDATE field_profile_info
+        <set>
+            <if test="sort!=null">sort=#{sort},</if>
+            <if test="name!=null">name=#{name},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除字段详情内容 -->
+    <delete id="delete">
+        DELETE FROM field_profile_info WHERE id IN
+        <foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

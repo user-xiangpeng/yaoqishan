@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.player_info.IPlayerInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="PlayerInfoMap" type="cn.javaex.yaoqishan.view.PlayerInfo">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="content" property="content" />
+		<result column="sort" property="sort" />
+	</resultMap>
+	
+	<!-- 查询播放器列表 -->
+	<select id="list" resultMap="PlayerInfoMap">
+		SELECT
+			*
+		FROM
+			player_info
+		ORDER BY
+			sort
+	</select>
+
+	<!-- 根据主键查询播放器信息 -->
+	<select id="selectById" resultMap="PlayerInfoMap">
+		SELECT
+			*
+		FROM
+			player_info
+		WHERE
+			id = #{id}
+	</select>
+	
+	<!-- 根据主键查询播放器内容 -->
+	<select id="selectContentById" resultType="String">
+		SELECT
+			content
+		FROM
+			player_info
+		WHERE
+			id = #{id}
+	</select>
+	
+	<!-- 插入新的播放器 -->
+	<insert id="insert">
+		INSERT INTO player_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name!=null and name!=''">name,</if>
+			<if test="content!=null and content!=''">content,</if>
+			<if test="sort!=null and sort!=''">sort,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name!=null and name!=''">#{name},</if>
+			<if test="content!=null and content!=''">#{content},</if>
+			<if test="sort!=null and sort!=''">#{sort},</if>
+		</trim>
+	</insert>
+	
+	<!-- 更新播放器 -->
+	<update id="update">
+		UPDATE player_info
+		<set>
+			<if test="name!=null">name=#{name},</if>
+			<if test="content!=null">content=#{content},</if>
+			<if test="sort!=null">sort=#{sort},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除播放器 -->
+	<delete id="delete">
+		DELETE FROM player_info WHERE id IN
+		<foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

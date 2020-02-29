@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.qiniu_info.IQiniuInfoDAO">
+	<cache/>
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="QiniuInfoMap" type="cn.javaex.yaoqishan.view.QiniuInfo">
+		<result column="id" property="id" />
+		<result column="type" property="type" />
+		<result column="name" property="name" />
+		<result column="domain" property="domain" />
+		<result column="ak" property="ak" />
+		<result column="sk" property="sk" />
+		<result column="bucket" property="bucket" />
+		<result column="width" property="width" />
+		<result column="height" property="height" />
+		<result column="compress" property="compress" />
+	</resultMap>
+	
+	<!-- 查询指定类型的配置 -->
+	<select id="selectByType" resultMap="QiniuInfoMap">
+		SELECT
+			*
+		FROM
+			qiniu_info
+		WHERE
+			type = #{type}
+	</select>
+	
+	<!-- 更新配置 -->
+	<update id="update">
+		UPDATE qiniu_info
+		<set>
+			<if test="domain!=null">domain=#{domain},</if>
+			<if test="ak!=null">ak=#{ak},</if>
+			<if test="sk!=null">sk=#{sk},</if>
+			<if test="bucket!=null">bucket=#{bucket},</if>
+			<if test="width!=null">width=#{width},</if>
+			<if test="height!=null">height=#{height},</if>
+			<if test="compress!=null">compress=#{compress},</if>
+		</set>
+		WHERE type = #{type}
+	</update>
+</mapper>

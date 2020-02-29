@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.type_field.ITypeFieldDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="TypeFieldMap" type="cn.javaex.yaoqishan.view.TypeField">
+		<result column="id" property="id" />
+		<result column="type_id" property="typeId" />
+		<result column="field_id" property="fieldId" />
+		<result column="is_screen" property="isScreen" />
+		<result column="is_required" property="isRequired" />
+		<result column="sort" property="sort" />
+		
+		<result column="field_name" property="fieldName" />
+	</resultMap>
+	
+	<select id="listByTypeId" resultMap="TypeFieldMap">
+		SELECT
+			tf.field_id,
+			tf.is_screen,
+			tf.is_required,
+			tf.sort,
+			fi.name AS field_name
+		FROM
+			type_field tf,
+			type_info ti,
+			field_info fi
+		WHERE
+			tf.type_id = ti.id
+		AND tf.field_id = fi.id
+		AND ti.id = #{typeId}
+		ORDER BY
+			tf.sort
+	</select>
+	
+	<!-- 判断在该分类中是否已包含此字段 -->
+	<select id="countFieldByTypeIdAndFieldId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			type_field
+		WHERE
+			type_id = #{typeId}
+		AND field_id = #{fieldId}
+	</select>
+	
+	<!-- 检索指定字段是否必填 -->
+	<select id="selectIsRequired" resultType="String">
+		SELECT
+			tf.is_required
+		FROM
+			type_field tf,
+			field_info fi
+		WHERE
+			tf.field_id = fi.id
+		AND tf.type_id = #{typeId}
+		AND fi.type = 'user'
+		AND fi.var_name = #{varName}
+	</select>
+	
+	<!-- 查询字段被使用的分类数量 -->
+	<select id="countByFieldId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			type_field
+		WHERE
+			field_id = #{fieldId}
+	</select>
+	
+	<!-- 查询字段被使用的分类数量 -->
+	<select id="countByTypeId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			type_field
+		WHERE
+			type_id = #{typeId}
+	</select>
+	
+	<!-- 删除该分类下的所有字段配置 -->
+	<delete id="deleteByTypeId">
+		DELETE FROM type_field WHERE type_id = #{typeId}
+	</delete>
+	
+	<insert id="batchInsert">
+		INSERT INTO type_field (type_id, field_id, is_screen, is_required, sort)
+		VALUES
+		<foreach collection="typeFieldList" item="item" index="index" separator=",">
+			(#{item.typeId}, #{item.fieldId}, #{item.isScreen}, #{item.isRequired}, #{item.sort})
+		</foreach>
+	</insert>
+</mapper>

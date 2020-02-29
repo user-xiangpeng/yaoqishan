@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.javaex.yaoqishan.dao.api_info.IApiInfoDAO">
+
+    <!-- 建立sql查询结果接口与实体属性的映射关系 -->
+    <resultMap id="ApiInfoMap" type="cn.javaex.yaoqishan.view.ApiInfo">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="sort" property="sort"/>
+        <result column="type" property="type"/>
+        <result column="type_id" property="typeId"/>
+        <result column="rank_type" property="rankType"/>
+        <result column="select_video" property="selectVideo"/>
+        <result column="cache_time" property="cacheTime"/>
+    </resultMap>
+
+    <!-- 插入字段 -->
+    <insert id="alter">
+		${alterSql}
+	</insert>
+
+    <!-- 查询指定类型的接口列表 -->
+    <select id="listByType" resultMap="ApiInfoMap">
+		SELECT
+			*
+		FROM
+			api_info
+		WHERE
+			type = #{type}
+		ORDER BY
+			sort
+	</select>
+
+    <!-- 根据主键，获取接口设置条件 -->
+    <select id="selectById" resultType="hashmap">
+		SELECT
+			*
+		FROM
+			api_info
+		WHERE
+			id = #{id}
+	</select>
+
+    <!-- 插入新的接口 -->
+    <insert id="insert">
+        INSERT INTO api_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sort!=null and sort!=''">sort,</if>
+            <if test="name!=null and name!=''">name,</if>
+            <if test="type!=null and type!=''">type,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sort!=null and sort!=''">#{sort},</if>
+            <if test="name!=null and name!=''">#{name},</if>
+            <if test="type!=null and type!=''">#{type},</if>
+        </trim>
+    </insert>
+
+    <!-- 更新接口 -->
+    <update id="update">
+        UPDATE api_info
+        <set>
+            <if test="sort!=null">sort=#{sort},</if>
+            <if test="name!=null">name=#{name},</if>
+            <if test="type!=null">type=#{type},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除接口 -->
+    <delete id="delete">
+        DELETE FROM api_info WHERE id IN
+        <foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 更新一条接口 -->
+    <update id="updateSQL">
+		${alterSql}
+	</update>
+
+    <!-- 判断字段有没有被接口使用 -->
+    <select id="countByField" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			api_info
+		WHERE
+			ISNULL(${field}, '') != ''
+	</select>
+
+    <!-- 更新接口 -->
+    <update id="updateRankSet">
+        UPDATE api_info
+        <set>
+            <if test="typeId!=null">type_id=#{typeId},</if>
+            <if test="rankType!=null">rank_type=#{rankType},</if>
+            <if test="num!=null">num=#{num},</if>
+            <if test="selectVideo!=null">select_video=#{selectVideo},</if>
+            <if test="cacheTime!=null">cache_time=#{cacheTime},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+</mapper>

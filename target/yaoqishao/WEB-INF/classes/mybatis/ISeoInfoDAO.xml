@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.seo_info.ISeoInfoDAO">
+	<cache/>
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="SeoInfoMap" type="cn.javaex.yaoqishan.view.SeoInfo">
+		<result column="id" property="id" />
+		<result column="title" property="title" />
+		<result column="keywords" property="keywords" />
+		<result column="description" property="description" />
+		<result column="type" property="type" />
+	</resultMap>
+	
+	<!-- 查询信息 -->
+	<select id="selectByType" resultMap="SeoInfoMap">
+		SELECT
+			*
+		FROM
+			seo_info
+		WHERE
+			type = #{type}
+	</select>
+	
+	<!-- 更新 -->
+	<update id="update">
+		UPDATE seo_info
+		<set>
+			<if test="title!=null">title=#{title},</if>
+			<if test="keywords!=null">keywords=#{keywords},</if>
+			<if test="description!=null">description=#{description},</if>
+		</set>
+		WHERE type = #{type}
+	</update>
+</mapper>

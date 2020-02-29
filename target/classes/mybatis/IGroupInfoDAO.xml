@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.group_info.IGroupInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="GroupInfoMap" type="cn.javaex.yaoqishan.view.GroupInfo">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="power" property="power" />
+		<result column="type" property="type" />
+		<result column="sort" property="sort" />
+	</resultMap>
+	
+	<!-- 查询用户组列表 -->
+	<select id="list" resultMap="GroupInfoMap">
+		SELECT
+			*
+		FROM
+			group_info
+		ORDER BY
+			sort
+	</select>
+	
+	<!-- 查询用户权限值 -->
+	<select id="selectPowerByUserId" resultType="String">
+		SELECT
+			gi.power
+		FROM
+			user_profile_info upi,
+			group_info gi
+		WHERE
+			upi.group_id = gi.id
+		AND upi.user_id = #{userId}
+	</select>
+	
+	<!-- 查询用户组名的数量，用于校验名字重复 -->
+	<select id="countByName" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			group_info
+		WHERE
+			name = #{name}
+		<if test="id!=null and id!=''">AND id != #{id}</if>
+	</select>
+	
+	<!-- 插入新的用户组 -->
+	<insert id="insert">
+		INSERT INTO group_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="sort!=null and sort!=''">sort,</if>
+			<if test="name!=null and name!=''">name,</if>
+			<if test="power!=null and power!=''">power,</if>
+			<if test="type!=null and type!=''">type,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="sort!=null and sort!=''">#{sort},</if>
+			<if test="name!=null and name!=''">#{name},</if>
+			<if test="power!=null and power!=''">#{power},</if>
+			<if test="type!=null and type!=''">#{type},</if>
+		</trim>
+	</insert>
+	
+	<!-- 更新用户组 -->
+	<update id="update">
+		UPDATE group_info
+		<set>
+			<if test="name!=null">name=#{name},</if>
+			<if test="sort!=null">sort=#{sort},</if>
+			<if test="power!=null">power=#{power},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除用户组 -->
+	<delete id="delete">
+		DELETE FROM group_info WHERE id IN
+		<foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.media_info.IMediaInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="MediaInfoMap" type="cn.javaex.yaoqishan.view.MediaInfo">
+		<result column="media_id" property="mediaId" />
+		<result column="type_id" property="typeId" />
+		<result column="update_time" property="updateTime" />
+		<result column="status" property="status" />
+		<result column="haibao" property="haibao" />
+		<result column="dafengmian" property="dafengmian" />
+		<result column="fengmian" property="fengmian" />
+		<result column="biaoti" property="biaoti" />
+		<result column="bieming" property="bieming" />
+		<result column="jianjie" property="jianjie" />
+		<result column="tag" property="tag" />
+		<result column="has_video" property="hasVideo" />
+	</resultMap>
+	
+	<!-- 插入字段 -->
+	<insert id="alter">
+		${alterSql}
+	</insert>
+	
+	<!-- 查询媒体列表 -->
+	<select id="list" resultMap="MediaInfoMap">
+		SELECT
+			media_id,
+			type_id,
+			haibao,
+			fengmian,
+			biaoti
+		FROM
+			media_info
+		WHERE
+			1 = 1
+		<if test="typeId!=null and typeId!=''">AND type_id = #{typeId}</if>
+		<if test="status!=null and status!=''">AND status = #{status}</if>
+		<if test="keyWord!=null and keyWord!=''">
+			AND (biaoti LIKE CONCAT('%',#{keyWord},'%') OR bieming LIKE CONCAT('%',#{keyWord},'%'))
+		</if>
+		ORDER BY
+			update_time DESC
+	</select>
+
+	<!-- 根据主键查询媒体信息 -->
+	<select id="selectById" resultMap="MediaInfoMap">
+		SELECT
+			media_id,
+			type_id,
+			haibao,
+			dafengmian,
+			fengmian,
+			biaoti,
+			bieming,
+			tag,
+			jianjie
+		FROM
+			media_info
+		WHERE
+			media_id = #{mediaId}
+	</select>
+
+	<!-- 根据主键和分类id，获取媒体字段信息 -->
+	<select id="selectSqlById" resultType="hashmap">
+		${selectSql}
+	</select>
+	
+	<!-- 根据主键，获取媒体信息 -->
+	<select id="selectByMediaId" resultType="hashmap">
+		SELECT
+			ti.name AS typeName,
+			CONVERT (VARCHAR (100), mi.update_time, 23) AS uploadTime,
+			mi.*
+		FROM
+			media_info mi,
+			type_info ti
+		WHERE
+			mi.type_id = ti.id
+		AND media_id = #{mediaId}
+	</select>
+	
+	<!-- 根据主键，查询该媒体标题 -->
+	<select id="selectBiaotiById" resultType="String">
+		SELECT
+			biaoti
+		FROM
+			media_info
+		WHERE
+			media_id = #{mediaId}
+	</select>
+	
+	<!-- 插入一条数据 -->
+	<insert id="insert">
+		${alterSql}
+	</insert>
+	
+	<!-- 更新一条媒体信息 -->
+	<update id="update">
+		${alterSql}
+	</update>
+	
+	<!-- 更新对应的媒体的时间、状态等 -->
+	<update id="updateMedia">
+		UPDATE media_info
+		<set>
+			<if test="updateTime!=null">update_time=#{updateTime},</if>
+			<if test="hasVideo!=null">has_video=#{hasVideo},</if>
+		</set>
+		WHERE media_id = #{mediaId}
+	</update>
+	
+	<!-- 批量更新媒体 -->
+	<update id="batchUpdate">
+		UPDATE media_info 
+		<set>
+			<if test="status!=null and status!=''">status=#{status},</if>
+			<if test="typeId!=null and typeId!=''">type_id=#{typeId},</if>
+		</set>
+		WHERE media_id IN
+		<foreach collection="mediaIdArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 批量删除 -->
+	<delete id="batchDelete">
+		DELETE FROM media_info WHERE media_id IN
+		<foreach collection="mediaIdArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+	<!-- 根据关键词，查询符合条件的媒体信息，获取其主键 -->
+	<select id="searchIdByKeyWord" resultType="String">
+		SELECT
+			media_id
+		FROM
+			media_info
+		WHERE
+			1 = 1
+		<if test="keyWord!=null and keyWord!=''">
+			AND (biaoti LIKE CONCAT('%',#{keyWord},'%') OR bieming LIKE CONCAT('%',#{keyWord},'%'))
+		</if>
+		ORDER BY
+			update_time DESC
+	</select>
+	
+	<!-- 根据筛选结果，查询媒体列表 -->
+	<select id="listByFilter" resultType="hashmap">
+		${selectSql}
+	</select>
+	
+	<!-- 查询标题对应的媒体的数量 -->
+	<select id="countByBiaoti" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			media_info
+		WHERE
+			biaoti = #{biaoti}
+		<if test="mediaId!=null and mediaId!=''">AND media_id != #{mediaId}</if>
+	</select>
+	
+	<!-- 根据接口自定义查询数据 -->
+	<select id="selectSqlByApi" resultType="hashmap">
+		${selectSql}
+	</select>
+</mapper>

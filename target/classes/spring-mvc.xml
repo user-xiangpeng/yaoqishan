@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+
+    <!-- 开始组件扫描 -->
+    <context:component-scan base-package="cn.javaex.yaoqishan"/>
+
+    <!-- 启用注解驱动 -->
+    <mvc:annotation-driven/>
+
+    <!-- 处理静态资源 -->
+    <mvc:default-servlet-handler/>
+
+    <!-- 配置视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/page/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--拦截器 -->
+    <mvc:interceptors>
+        <!--多个拦截器，顺序执行 -->
+        <!-- 登陆认证拦截器 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="cn.javaex.yaoqishan.interceptor.QingInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!-- 文件上传 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设置默认编码 -->
+        <property name="defaultEncoding" value="utf-8"/>
+        <!-- 上传文件总的大小最大为5M-->
+        <property name="maxUploadSize" value="5242440"/>
+    </bean>
+
+    <!-- 自定义的全局异常处理器
+    只要实现HandlerExceptionResolver接口就是全局异常处理器-->
+    <bean class="cn.javaex.yaoqishan.exception.QingExceptionResolver"/>
+</beans>

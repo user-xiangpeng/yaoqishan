@@ -1,0 +1,311 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.video_info.IVideoInfoDAO">
+
+    <!-- 建立sql查询结果字段与实体属性的映射关系 -->
+    <resultMap id="VideoInfoMap" type="cn.javaex.yaoqishan.view.VideoInfo">
+        <result column="video_id" property="videoId"/>
+        <result column="media_id" property="mediaId"/>
+        <result column="num" property="num"/>
+        <result column="title" property="title"/>
+        <result column="image" property="image"/>
+        <result column="url" property="url"/>
+        <result column="player_id" property="playerId"/>
+        <result column="sort" property="sort"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
+        <result column="power" property="power"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="view_count_day" property="viewCountDay"/>
+        <result column="view_count_week" property="viewCountWeek"/>
+        <result column="view_count_month" property="viewCountMonth"/>
+        <result column="view_count_year" property="viewCountYear"/>
+
+        <result column="biaoti" property="biaoti"/>
+    </resultMap>
+
+    <!-- 根据媒体信息主键，查询该视频下的所有播放集数，从大到小排序（后台管理专用） -->
+    <select id="listByMediaIdDesc" resultMap="VideoInfoMap">
+		SELECT
+			*
+		FROM
+			video_info
+		WHERE
+			media_id = #{mediaId}
+		ORDER BY
+			sort DESC,
+			video_id DESC
+	</select>
+
+    <!-- 根据媒体信息主键，查询该视频下的所有播放集数（正常的） -->
+    <select id="listByMediaId" resultMap="VideoInfoMap">
+		SELECT
+			video_id,
+			media_id,
+			num,
+			title,
+			image,
+			view_count,
+			remark,
+			CONVERT(varchar(100), update_time, 23) AS update_time
+		FROM
+			video_info
+		WHERE
+			media_id = #{mediaId}
+		AND status = '1'
+		ORDER BY
+			sort,
+			video_id
+	</select>
+
+    <!-- 根据主键查询信息 -->
+    <select id="selectById" resultMap="VideoInfoMap">
+		SELECT
+			mi.biaoti,
+			vi.*
+		FROM
+			video_info vi,
+			media_info mi
+		WHERE
+			vi.media_id = mi.media_id
+		AND vi.video_id = #{videoId}
+	</select>
+
+    <!-- 根据主键查询信息（前台播放页面专用） -->
+    <select id="selectByIdWithPortal" resultMap="VideoInfoMap">
+		SELECT
+			mi.biaoti,
+			vi.video_id,
+			vi.media_id,
+			vi.num,
+			vi.title,
+			vi.power,
+			vi.view_count,
+			vi.view_count_day,
+			vi.view_count_week,
+			vi.view_count_month,
+			vi.view_count_year
+		FROM
+			video_info vi,
+			media_info mi
+		WHERE
+			vi.media_id = mi.media_id
+		AND vi.video_id = #{videoId}
+	</select>
+
+    <!-- 根据视频主键查询视频播放源 -->
+    <select id="selectVideoPlayById" resultMap="VideoInfoMap">
+		SELECT
+			player_id,
+			url
+		FROM
+			video_info
+		WHERE
+			video_id = #{videoId}
+	</select>
+
+    <!-- 查询该视频下的第一集 -->
+    <select id="selectByMediaIdFirst" resultMap="VideoInfoMap">
+		SELECT
+			TOP 1
+			video_id,
+			num,
+			view_count
+		FROM
+			video_info
+		WHERE
+			media_id = #{mediaId}
+		AND status = '1'
+		ORDER BY
+			sort
+	</select>
+
+    <!-- 查询该视频下的最新一集 -->
+    <select id="selectByMediaIdLast" resultMap="VideoInfoMap">
+		SELECT
+			TOP 1
+			video_id,
+			num,
+			view_count
+		FROM
+			video_info
+		WHERE
+			media_id = #{mediaId}
+		AND status = '1'
+		ORDER BY
+			sort DESC
+	</select>
+
+    <!-- 查询使用该播放器的视频个数 -->
+    <select id="countByPlayerId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			video_info
+		WHERE
+			player_id = #{playerId}
+	</select>
+
+    <!-- 插入一条新数据 -->
+    <insert id="insert">
+        INSERT INTO video_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mediaId!=null and mediaId!=''">media_id,</if>
+            <if test="num!=null and num!=''">num,</if>
+            <if test="title!=null and title!=''">title,</if>
+            <if test="image!=null and image!=''">image,</if>
+            <if test="url!=null and url!=''">url,</if>
+            <if test="playerId!=null and playerId!=''">player_id,</if>
+            <if test="sort!=null and sort!=''">sort,</if>
+            <if test="status!=null and status!=''">status,</if>
+            <if test="power!=null and power!=''">power,</if>
+            <if test="remark!=null and remark!=''">remark,</if>
+            <if test="updateTime!=null and updateTime!=''">update_time,</if>
+            <if test="viewCount!=null and viewCount!=''">view_count,</if>
+            <if test="viewCountDay!=null and viewCountDay!=''">view_count_day,</if>
+            <if test="viewCountWeek!=null and viewCountWeek!=''">view_count_week,</if>
+            <if test="viewCountMonth!=null and viewCountMonth!=''">view_count_month,</if>
+            <if test="viewCountYear!=null and viewCountYear!=''">view_count_year,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mediaId!=null and mediaId!=''">#{mediaId},</if>
+            <if test="num!=null and num!=''">#{num},</if>
+            <if test="title!=null and title!=''">#{title},</if>
+            <if test="image!=null and image!=''">#{image},</if>
+            <if test="url!=null and url!=''">#{url},</if>
+            <if test="playerId!=null and playerId!=''">#{playerId},</if>
+            <if test="sort!=null and sort!=''">#{sort},</if>
+            <if test="status!=null and status!=''">#{status},</if>
+            <if test="power!=null and power!=''">#{power},</if>
+            <if test="remark!=null and remark!=''">#{remark},</if>
+            <if test="updateTime!=null and updateTime!=''">#{updateTime},</if>
+            <if test="viewCount!=null and viewCount!=''">#{viewCount},</if>
+            <if test="viewCountDay!=null and viewCountDay!=''">#{viewCountDay},</if>
+            <if test="viewCountWeek!=null and viewCountWeek!=''">#{viewCountWeek},</if>
+            <if test="viewCountMonth!=null and viewCountMonth!=''">#{viewCountMonth},</if>
+            <if test="viewCountYear!=null and viewCountYear!=''">#{viewCountYear},</if>
+        </trim>
+    </insert>
+
+    <!-- 更新一条数据 -->
+    <update id="update">
+        UPDATE video_info
+        <set>
+            <if test="mediaId!=null">media_id=#{mediaId},</if>
+            <if test="num!=null">num=#{num},</if>
+            <if test="title!=null">title=#{title},</if>
+            <if test="image!=null">image=#{image},</if>
+            <if test="url!=null">url=#{url},</if>
+            <if test="playerId!=null">player_id=#{playerId},</if>
+            <if test="sort!=null">sort=#{sort},</if>
+            <if test="status!=null">status=#{status},</if>
+            <if test="power!=null">power=#{power},</if>
+            <if test="remark!=null">remark=#{remark},</if>
+            <if test="updateTime!=null">update_time=#{updateTime},</if>
+            <if test="viewCount!=null">view_count=#{viewCount},</if>
+            <if test="viewCountDay!=null">view_count_day=#{viewCountDay},</if>
+            <if test="viewCountWeek!=null">view_count_week=#{viewCountWeek},</if>
+            <if test="viewCountMonth!=null">view_count_month=#{viewCountMonth},</if>
+            <if test="viewCountYear!=null">view_count_year=#{viewCountYear},</if>
+        </set>
+        WHERE video_id = #{videoId}
+    </update>
+
+    <!-- 更新统一封面 -->
+    <update id="updateImage">
+		UPDATE video_info
+		SET image = #{image}
+		WHERE
+			media_id = #{mediaId}
+	</update>
+
+    <!-- 更新统一权限值 -->
+    <update id="updatePower">
+		UPDATE video_info
+		SET power = #{power}
+		WHERE
+			media_id = #{mediaId}
+	</update>
+
+    <!-- 批量更新视频状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE video_info
+        SET status = #{status}
+        WHERE video_id IN
+        <foreach collection="videoIdArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 根据媒体主键和第几集，查询是否存在既存数据 -->
+    <select id="selectByMediaIdAndNum" resultMap="VideoInfoMap">
+		SELECT
+			*
+		FROM
+			video_info
+		WHERE
+			media_id = #{mediaId}
+		AND num = #{num}
+	</select>
+
+    <!-- 批量删除 -->
+    <delete id="batchDelete">
+        DELETE FROM video_info WHERE video_id IN
+        <foreach collection="videoIdArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 根据媒体主键数组，批量删除视频信息 -->
+    <delete id="batchDeleteByMediaId">
+        DELETE FROM video_info WHERE media_id IN
+        <foreach collection="mediaIdArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 获取最新视频 -->
+    <select id="listNewVideo" resultMap="VideoInfoMap">
+		SELECT
+			TOP ${count}
+			mi.biaoti,
+			vi.video_id,
+			vi.num,
+			vi.title,
+			vi.image
+		FROM
+			video_info vi,
+			media_info mi
+		WHERE
+			vi.status = '1'
+		AND mi.status = '1'
+		AND vi.media_id = mi.media_id
+		ORDER BY
+			vi.video_id DESC
+	</select>
+
+    <!-- 批量更新视频的状态 -->
+    <update id="batchUpdate">
+        UPDATE video_info
+        <set>
+            <if test="status!=null">status=#{status},</if>
+        </set>
+        WHERE media_id IN
+        <foreach collection="mediaIdArr" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 清空视频点击量 -->
+    <update id="clearViewCount">
+        UPDATE video_info
+        <set>
+            <if test="viewCountDay!=null">view_count_day=#{viewCountDay},</if>
+            <if test="viewCountWeek!=null">view_count_week=#{viewCountWeek},</if>
+            <if test="viewCountMonth!=null">view_count_month=#{viewCountMonth},</if>
+            <if test="viewCountYear!=null">view_count_year=#{viewCountYear},</if>
+        </set>
+    </update>
+</mapper>

@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="cn.javaex.yaoqishan.dao.star_info.IStarInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="StarInfoMap" type="cn.javaex.yaoqishan.view.StarInfo">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="alias" property="alias" />
+		<result column="sex" property="sex" />
+		<result column="region" property="region" />
+		<result column="blood" property="blood" />
+		<result column="birthday" property="birthday" />
+		<result column="constellation" property="constellation" />
+		<result column="occupation" property="occupation" />
+		<result column="image" property="image" />
+		<result column="introduction" property="introduction" />
+	</resultMap>
+	
+	<!-- 查询分类列表 -->
+	<select id="list" resultMap="StarInfoMap">
+		SELECT
+			*
+		FROM
+			star_info
+		ORDER BY
+			id DESC
+	</select>
+	
+	<!-- 查询单个明星的信息 -->
+	<select id="selectById" resultMap="StarInfoMap">
+		SELECT
+			*
+		FROM
+			star_info
+		WHERE
+			id = #{id}
+	</select>
+	
+	<!-- 插入一条明星数据 -->
+	<insert id="insert">
+		INSERT INTO star_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="name!=null and name!=''">name,</if>
+			<if test="alias!=null and alias!=''">alias,</if>
+			<if test="sex!=null and sex!=''">sex,</if>
+			<if test="region!=null and region!=''">region,</if>
+			<if test="blood!=null and blood!=''">blood,</if>
+			<if test="birthday!=null and birthday!=''">birthday,</if>
+			<if test="constellation!=null and constellation!=''">constellation,</if>
+			<if test="occupation!=null and occupation!=''">occupation,</if>
+			<if test="image!=null and image!=''">image,</if>
+			<if test="introduction!=null and introduction!=''">introduction,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="name!=null and name!=''">#{name},</if>
+			<if test="alias!=null and alias!=''">#{alias},</if>
+			<if test="sex!=null and sex!=''">#{sex},</if>
+			<if test="region!=null and region!=''">#{region},</if>
+			<if test="blood!=null and blood!=''">#{blood},</if>
+			<if test="birthday!=null and birthday!=''">#{birthday},</if>
+			<if test="constellation!=null and constellation!=''">#{constellation},</if>
+			<if test="occupation!=null and occupation!=''">#{occupation},</if>
+			<if test="image!=null and image!=''">#{image},</if>
+			<if test="introduction!=null and introduction!=''">#{introduction},</if>
+		</trim>
+	</insert>
+	
+	<!-- 更新一条明星数据 -->
+	<update id="update">
+		UPDATE star_info
+		<set>
+			<if test="name!=null">name=#{name},</if>
+			<if test="alias!=null">alias=#{alias},</if>
+			<if test="sex!=null">sex=#{sex},</if>
+			<if test="region!=null">region=#{region},</if>
+			<if test="blood!=null">blood=#{blood},</if>
+			<if test="birthday!=null">birthday=#{birthday},</if>
+			<if test="constellation!=null">constellation=#{constellation},</if>
+			<if test="occupation!=null">occupation=#{occupation},</if>
+			<if test="image!=null">image=#{image},</if>
+			<if test="introduction!=null">introduction=#{introduction},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+</mapper>
